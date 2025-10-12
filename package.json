@@ -1,0 +1,33 @@
+{
+  "name": "fluig-api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "pnpm run build:lib",
+    "build:lib": "ng build fluig-api",
+    "watch:lib": "ng build fluig-api --watch",
+    "serve:demo": "ng serve demo"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": ">=19.0.0 <21.0.0",
+    "@angular/build": ">=19.0.0 <21.0.0",
+    "@angular/cli": ">=19.0.0 <21.0.0",
+    "@angular/compiler-cli": ">=19.0.0 <21.0.0",
+    "@types/crypto-js": "^4.2.2",
+    "crypto-js": "^4.2.0",
+    "ng-packagr": ">=19.0.0 <21.0.0",
+    "oauth-1.0a": "^2.2.6",
+    "typescript": "~5.8.2"
+  },
+  "dependencies": {
+    "@angular/common": ">=19.0.0 <21.0.0",
+    "@angular/compiler": ">=19.0.0 <21.0.0",
+    "@angular/core": ">=19.0.0 <21.0.0",
+    "@angular/forms": ">=19.0.0 <21.0.0",
+    "@angular/platform-browser": ">=19.0.0 <21.0.0",
+    "@angular/router": ">=19.0.0 <21.0.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.15.0"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "name": "fluig-api",
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "Angular service and HttpClient Interceptor for handling authentication in Fluig platform applications during local development.",
+  "author": "Gabriel Nascimento",
+  "type": "module",
+  "exports": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gabrielgnsilva/fluig-api.git"
+  },
+  "keywords": [
+    "api service",
+    "api",
+    "auth service",
+    "auth",
+    "fluig api service",
+    "fluig api",
+    "fluig auth service",
+    "fluig auth",
+    "fluig",
+    "service",
+    "usuario aplicativo",
+    "usuario"
+  ],
+  "bugs": {
+    "url": "https://github.com/gabrielgnsilva/fluig-api/issues"
+  },
+  "homepage": "https://github.com/gabrielgnsilva/fluig-api#readme",
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.2"
+  },
+  "peerDependencies": {
+    "@angular/common": ">=19.0.0 <21.0.0",
+    "@angular/core": ">=19.0.0 <21.0.0",
+    "crypto-js": "^4.2.0",
+    "oauth-1.0a": "^2.2.6",
+    "rxjs": "~7.8.0"
+  },
+  "sideEffects": false
+}
