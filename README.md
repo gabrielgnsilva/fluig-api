@@ -157,6 +157,38 @@ export class App implements OnInit {
 }
 ```
 
+## Troubleshooting
+
+### Handling CORS Issues
+
+During local development, it's common to face CORS issues when attempting to access the Fluig using relative paths (e.g., `/api`, `/public`, etc.) that happens because the Fluig server is on a different origin than your local development server (e.g., `http://localhost:4200`). This results in blocked requests due to CORS policy restrictions.
+
+A practical solution is to configure a reverse proxy to redirect local requests to the Fluig server. You can set this up using a `proxy.conf.json` file and use it in combination with the `ng serve` command:
+
+```jsonc
+// proxy.conf.json
+{
+  "/api": {
+    "target": "https://your-fluig-server.com",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug",
+  },
+}
+```
+
+Then, run Angular with:
+
+```bash
+ng serve --proxy-config proxy.conf.json
+```
+
+You can read more about this in my blog post[^1] and in the Angular documentation[^2].
+
+[^1]: [How to Fix CORS Issues with Fluig Using Reverse Proxy in Angular](https://devoncommand.com/posts/programming/2025/proxy-angular-fluig/)
+
+[^2]: [Proxying to a backend server](https://angular.dev/tools/cli/serve#proxying-to-a-backend-server)
+
 ## Contributions
 
 Contributions are welcome! Feel free to fork this repository and submit pull requests.
