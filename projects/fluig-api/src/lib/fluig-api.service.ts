@@ -27,6 +27,15 @@ type RequestOptions = {
   url: string;
   method: string;
   data?: any;
+  options?: {
+    headers?: HttpHeaders | Record<string, string | string[]>;
+    params?:
+      | HttpParams
+      | Record<
+          string,
+          string | number | boolean | ReadonlyArray<string | number | boolean>
+        >;
+  };
   includeBodyHash?: boolean;
 };
 
@@ -69,12 +78,34 @@ export class FluigAPIService {
   }
 
   private getAuthHeader(
-    request?: RequestOptions,
-    baseHdr?: HttpHeaders
-  ): HttpHeaders {
-    let headers = baseHdr ?? new HttpHeaders();
+    request?: RequestOptions
+  ): HttpHeaders | Record<string, string | string[]> {
+    let headers = request?.options?.headers ?? new HttpHeaders();
     if (!this.cfg || !this.cfg.local) return headers;
-    return headers.set('Authorization', this.getAuthToken(request));
+
+    const oauthToken = this.getAuthToken(request);
+    if (typeof headers === 'object' && !(headers instanceof HttpHeaders)) {
+      return { ...headers, Authorization: oauthToken };
+    }
+    return headers.set('Authorization', oauthToken);
+  }
+
+  private getUrlWithParams(
+    url: string,
+    params?:
+      | HttpParams
+      | Record<
+          string,
+          string | number | boolean | ReadonlyArray<string | number | boolean>
+        >
+  ) {
+    if (params == null) return url;
+    const httpParams =
+      params instanceof HttpParams
+        ? new HttpParams({ fromString: params.toString() })
+        : new HttpParams({ fromObject: params });
+    const paramString = httpParams.toString();
+    return paramString ? `${url}?${paramString}` : url;
   }
 
   private signRequest(request: RequestOptions) {
@@ -82,7 +113,10 @@ export class FluigAPIService {
       throw new Error('[FluigAPI] OAuth configuration is missing');
     }
 
-    const absoluteUrl = new URL(request.url, this.cfg.url).toString();
+    const absoluteUrl = new URL(
+      this.getUrlWithParams(request.url, request?.options?.params),
+      this.cfg.url
+    ).toString();
 
     const authOptions = {
       url: absoluteUrl,
@@ -96,10 +130,18 @@ export class FluigAPIService {
       authOptions.data = request.data;
     }
 
-    return this.oauth.authorize(authOptions, {
-      key: this.cfg.oauth.accessToken,
-      secret: this.cfg.oauth.tokenSecret,
-    });
+    return this.oauth.authorize(
+      {
+        url: authOptions.url,
+        method: authOptions.method,
+        includeBodyHash: authOptions.includeBodyHash,
+        data: authOptions.data,
+      },
+      {
+        key: this.cfg.oauth.accessToken,
+        secret: this.cfg.oauth.tokenSecret,
+      }
+    );
   }
 
   /** Get the `Authorization` token to be used in the request header
@@ -713,7 +755,14 @@ export class FluigAPIService {
   public delete<T>(url: string, params?: any): Observable<any> {
     return this.http.delete<T>(url, {
       ...params,
-      headers: this.getAuthHeader({ method: 'DELETE', url }),
+      headers: this.getAuthHeader({
+        method: 'DELETE',
+        url,
+        options: {
+          headers: params?.headers,
+          params: params?.params,
+        },
+      }),
     });
   }
 
@@ -1374,7 +1423,14 @@ export class FluigAPIService {
   public get<T>(url: string, params: any = {}): Observable<any> {
     return this.http.get<T>(url, {
       ...params,
-      headers: this.getAuthHeader({ method: 'GET', url }),
+      headers: this.getAuthHeader({
+        method: 'GET',
+        url,
+        options: {
+          headers: params?.headers,
+          params: params?.params,
+        },
+      }),
     });
   }
 
@@ -1994,7 +2050,14 @@ export class FluigAPIService {
   public patch<T>(url: string, body?: any, params?: any): Observable<any> {
     return this.http.patch<T>(url, body, {
       ...params,
-      headers: this.getAuthHeader({ method: 'PATCH', url }),
+      headers: this.getAuthHeader({
+        method: 'PATCH',
+        url,
+        options: {
+          headers: params?.headers,
+          params: params?.params,
+        },
+      }),
     });
   }
 
@@ -2688,7 +2751,14 @@ export class FluigAPIService {
   public post<T>(url: string, body?: any, params?: any): Observable<any> {
     return this.http.post<T>(url, body, {
       ...params,
-      headers: this.getAuthHeader({ method: 'POST', url }),
+      headers: this.getAuthHeader({
+        method: 'POST',
+        url,
+        options: {
+          headers: params?.headers,
+          params: params?.params,
+        },
+      }),
     });
   }
 
@@ -3306,7 +3376,14 @@ export class FluigAPIService {
   public put<T>(url: string, body?: any, params?: any): Observable<any> {
     return this.http.put<T>(url, body, {
       ...params,
-      headers: this.getAuthHeader({ method: 'PUT', url }),
+      headers: this.getAuthHeader({
+        method: 'PUT',
+        url,
+        options: {
+          headers: params?.headers,
+          params: params?.params,
+        },
+      }),
     });
   }
 }
