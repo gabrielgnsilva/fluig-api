@@ -1,6 +1,6 @@
 {
   "name": "fluig-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "description": "Angular service and HttpClient Interceptor for handling authentication in Fluig platform applications during local development.",
   "author": "Gabriel Nascimento",
