@@ -59,8 +59,8 @@ export class FluigAPIService {
 
     return new OAuth({
       consumer: {
-        key: this.cfg.oauth!.consumerKey,
-        secret: this.cfg.oauth!.consumerSecret,
+        key: this.cfg.oauth.consumerKey,
+        secret: this.cfg.oauth.consumerSecret,
       },
       signature_method: 'HMAC-SHA1',
       body_hash_function: bodyHash,
