@@ -26,7 +26,7 @@ export const fluigAPIInterceptor: HttpInterceptorFn = (
   }
 
   const authToken = inject(FluigAPIService).getAuthToken({
-    url: req.url,
+    url: req.urlWithParams,
     method: req.method,
     data: req.body,
   });
