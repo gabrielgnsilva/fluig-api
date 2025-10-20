@@ -100,10 +100,12 @@ export class FluigAPIService {
         >
   ) {
     if (params == null) return url;
-    const httpParams =
+    const httpParams: HttpParams =
       params instanceof HttpParams
-        ? new HttpParams({ fromString: params.toString() })
-        : new HttpParams({ fromObject: params });
+        ? params
+        : typeof params === 'string'
+          ? new HttpParams({ fromString: params })
+          : new HttpParams({ fromObject: params });
     const paramString = httpParams.toString();
     return paramString ? `${url}?${paramString}` : url;
   }
@@ -113,13 +115,18 @@ export class FluigAPIService {
       throw new Error('[FluigAPI] OAuth configuration is missing');
     }
 
-    const absoluteUrl = new URL(
+    const url = new URL(
       this.getUrlWithParams(request.url, request?.options?.params),
       this.cfg.url
-    ).toString();
+    );
+
+    // OAuth 1.0a requires base URL (without query) + structured params
+    // to ensure signature base string matches server expectations exactly.
+    // Parsing query from full URL can cause subtle differences (empty values, duplicates).
+    const baseUrl = `${url.origin}${url.pathname}`;
 
     const authOptions = {
-      url: absoluteUrl,
+      url: baseUrl,
       method: request.method.toUpperCase(),
       includeBodyHash: false,
       data: undefined,
@@ -128,6 +135,22 @@ export class FluigAPIService {
     if (['POST', 'PUT', 'PATCH'].includes(request.method)) {
       authOptions.includeBodyHash = true;
       authOptions.data = request.data;
+    } else {
+      const queryParams: Record<string, string | string[]> = {};
+      // Preserve existing query parameters in the URL
+      url.searchParams.forEach((value, key) => {
+        if (Object.prototype.hasOwnProperty.call(queryParams, key)) {
+          const prev = queryParams[key];
+          if (Array.isArray(prev)) prev.push(value);
+          else queryParams[key] = [prev as string, value];
+        } else {
+          queryParams[key] = value;
+        }
+      });
+
+      authOptions.data = Object.keys(queryParams).length
+        ? (queryParams as any)
+        : undefined;
     }
 
     return this.oauth.authorize(
@@ -2053,6 +2076,7 @@ export class FluigAPIService {
       headers: this.getAuthHeader({
         method: 'PATCH',
         url,
+        data: body,
         options: {
           headers: params?.headers,
           params: params?.params,
@@ -2754,6 +2778,7 @@ export class FluigAPIService {
       headers: this.getAuthHeader({
         method: 'POST',
         url,
+        data: body,
         options: {
           headers: params?.headers,
           params: params?.params,
@@ -3379,6 +3404,7 @@ export class FluigAPIService {
       headers: this.getAuthHeader({
         method: 'PUT',
         url,
+        data: body,
         options: {
           headers: params?.headers,
           params: params?.params,
