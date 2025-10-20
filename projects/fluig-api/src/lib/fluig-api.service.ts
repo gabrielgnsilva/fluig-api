@@ -100,10 +100,12 @@ export class FluigAPIService {
         >
   ) {
     if (params == null) return url;
-    const httpParams =
+    const httpParams: HttpParams =
       params instanceof HttpParams
-        ? new HttpParams({ fromString: params.toString() })
-        : new HttpParams({ fromObject: params });
+        ? params
+        : typeof params === 'string'
+          ? new HttpParams({ fromString: params })
+          : new HttpParams({ fromObject: params });
     const paramString = httpParams.toString();
     return paramString ? `${url}?${paramString}` : url;
   }
